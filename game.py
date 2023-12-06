@@ -15,14 +15,7 @@ forest_map = [
 
 import pygame
 import sys
-
-class Player:
-    def __init__(self, name):
-        self.name = name
-        self.gpa = 3.00
-
-        # Ensure GPA does not exceed 4.00
-        self.gpa = min(self.gpa, 4.50)
+import time
 
 # Initialize Pygame
 pygame.init()
@@ -38,19 +31,6 @@ RED = (255, 0, 0)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pokemon Forest")
 
-# Load and resize player and NPC character images
-player_image = pygame.image.load("player.png")  # Replace with your player image
-player_image = pygame.transform.scale(player_image, (TILE_SIZE, TILE_SIZE))
-
-npc_image_up = pygame.image.load("npc_up.png")  # Replace with your NPC image facing up
-npc_image_up = pygame.transform.scale(npc_image_up, (TILE_SIZE, TILE_SIZE))
-npc_image_right = pygame.image.load("npc_right.png")  # Replace with your NPC image facing up
-npc_image_right = pygame.transform.scale(npc_image_right, (TILE_SIZE, TILE_SIZE))
-npc_image_down = pygame.image.load("npc_down.png")  # Replace with your NPC image facing up
-npc_image_down = pygame.transform.scale(npc_image_down, (TILE_SIZE, TILE_SIZE))
-npc_image_left = pygame.image.load("npc_left.png")  # Replace with your NPC image facing up
-npc_image_left = pygame.transform.scale(npc_image_left, (TILE_SIZE, TILE_SIZE))
-
 # Set initial player position
 player_x, player_y = 2, 9
 
@@ -65,8 +45,157 @@ npc_engage_distance = 1  # Adjust the distance at which NPC engages the player
 # Flag to check if the question is initiated
 question_initiated = False
 
+
+# Load and resize player and NPC character images
+player_image = pygame.image.load("player.png")  # Replace with your player image
+player_image = pygame.transform.scale(player_image, (TILE_SIZE, TILE_SIZE))
+
+npc_image_up = pygame.image.load("npc_up.png")  # Replace with your NPC image facing up
+npc_image_up = pygame.transform.scale(npc_image_up, (TILE_SIZE, TILE_SIZE))
+npc_image_right = pygame.image.load("npc_right.png")  # Replace with your NPC image facing up
+npc_image_right = pygame.transform.scale(npc_image_right, (TILE_SIZE, TILE_SIZE))
+npc_image_down = pygame.image.load("npc_down.png")  # Replace with your NPC image facing up
+npc_image_down = pygame.transform.scale(npc_image_down, (TILE_SIZE, TILE_SIZE))
+npc_image_left = pygame.image.load("npc_left.png")  # Replace with your NPC image facing up
+npc_image_left = pygame.transform.scale(npc_image_left, (TILE_SIZE, TILE_SIZE))
+
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.gpa = 3.00
+
+        # Ensure GPA does not exceed 4.00
+        self.gpa = min(self.gpa, 4.50)
+    
 # Player stats
 player = Player("Ash")  # Use the Player class
+
+class FSM:
+    def __init__(self, initial_state):
+        # Dictionary (input_symbol, current_state) --> (action, next_state).
+        self.state_transitions = {}
+        self.current_state = initial_state
+
+    def add_transition(self, input_symbol, state, action=None, next_state=None):
+        """
+        Adds a transition to the instance variable state_transitions
+        that associates:
+            (input_symbol, current_state) --> (action, next_state)
+
+        The action may be set to None in which case the process() method will
+        ignore the action and only set the next_state.
+
+        The next_state may be set to None in which case the current state will be unchanged.
+        
+        Args:
+            input_symbol (anything): The input received
+            state (anything): The current state
+            action (function, optional): The action to take/function to run. Defaults to None.
+            next_state (anything, optional): The next state to transition to. Defaults to None.
+        """
+        # TODO: implement add transition
+        if next_state != None:
+            self.state_transitions[(input_symbol, state)] = (action, next_state)
+        else:
+            self.state_transitions[(input_symbol, state)] = (action, state)
+
+
+    def get_transition(self, input_symbol, state):
+        """
+        Returns tuple (action, next state) given an input_symbol and state.
+        Normally you do not call this method directly. It is called by
+        process().
+
+        Args:
+            input_symbol (anything): The given input symbol
+            state (anything): The current state
+
+        Returns:
+            tuple: Returns the tuple (action, next_state)
+        """
+        # TODO: Implement get transition
+        return(self.state_transitions[(input_symbol, state)])
+        
+
+    def process(self, input_symbol):
+        """
+        The main method that you call to process input. This may
+        cause the FSM to change state and call an action. This method calls
+        get_transition() to find the action and next_state associated with the
+        input_symbol and current_state. If the action is None then the action
+        is not called and only the current state is changed. This method
+        processes one complete input symbol.
+        Args:
+            input_symbol (anything): The input to process
+        """
+        # TODO: Implement process
+        update = self.get_transition(input_symbol, self.current_state)
+        if update[0] != None:
+            update[0]()
+        self.current_state = update[1]
+        
+
+class NPC:
+    # States
+    UP, DOWN, LEFT, RIGHT = "u", "d", "r", "l"
+
+    # Inputs
+    TIMER_UP = "tu"
+    DIRECTIONS = {UP: npc_image_up, DOWN: npc_image_down, RIGHT: npc_image_right, LEFT: npc_image_left}
+
+
+    def __init__(self):
+        # Initialize FSM
+        self.fsm = FSM(self.DOWN)
+        self.init_fsm()
+        self.timer_duration = 1
+
+        # Start DOWN
+        self.turn_DOWN()
+        pygame.display.flip()
+
+    def init_fsm(self):
+        """
+        Adds all states to the FSM
+        """
+        self.fsm.add_transition(self.TIMER_UP, self.DOWN, self.turn_RIGHT, self.RIGHT)
+        self.fsm.add_transition(self.TIMER_UP, self.RIGHT, self.turn_UP, self.UP)
+        self.fsm.add_transition(self.TIMER_UP, self.UP, self.turn_LEFT, self.LEFT)
+        self.fsm.add_transition(self.TIMER_UP, self.LEFT, self.turn_DOWN, self.DOWN)
+
+    def turn_RIGHT(self):
+        screen.blit(self.DIRECTIONS[self.RIGHT], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+        self.timer_duration = 5
+    
+    def turn_UP(self):
+        screen.blit(self.DIRECTIONS[self.UP], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+        self.timer_duration = 5
+    
+    def turn_DOWN(self):
+        screen.blit(self.DIRECTIONS[self.DOWN], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+        self.timer_duration = 5
+    
+    def turn_LEFT(self):
+        screen.blit(self.DIRECTIONS[self.LEFT], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+        self.timer_duration = 5
+
+    def run(self):
+        start_time = time.time()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+            elapsed_time = time.time() - start_time
+            print(elapsed_time)
+            if elapsed_time > self.timer_duration:
+                self.fsm.process(self.TIMER_UP)
+                start_time = time.time()
+                pygame.display.flip()
+
+            time.sleep(0.5)
 
 # Question and answer data
 question_data = {
@@ -212,16 +341,20 @@ while running:
     # Draw player character
     screen.blit(player_image, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
-    # Draw NPC character
-    if npc_direction == "up":
-        screen.blit(npc_image_up, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-    # Add similar conditions for other directions
-    if npc_direction == "right":
-        screen.blit(npc_image_right, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-    if npc_direction == "down":
-        screen.blit(npc_image_down, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-    if npc_direction == "left":
-        screen.blit(npc_image_left, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    # # Draw NPC character
+    # if npc_direction == "up":
+    #     screen.blit(npc_image_up, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    # # Add similar conditions for other directions
+    # if npc_direction == "right":
+    #     screen.blit(npc_image_right, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    # if npc_direction == "down":
+    #     screen.blit(npc_image_down, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    # if npc_direction == "left":
+    #     screen.blit(npc_image_left, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+
+    npc = NPC()
+    npc.run()
+
 
     # Display player's GPA in the bottom right corner
     display_gpa(screen, font, player)
