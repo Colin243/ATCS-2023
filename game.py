@@ -70,116 +70,116 @@ class Player:
 # Player stats
 player = Player("Ash")  # Use the Player class
 
-class FSM:
-    def __init__(self, initial_state):
-        # Dictionary (input_symbol, current_state) --> (action, next_state).
-        self.state_transitions = {}
-        self.current_state = initial_state
+# class FSM:
+#     def __init__(self, initial_state):
+#         # Dictionary (input_symbol, current_state) --> (action, next_state).
+#         self.state_transitions = {}
+#         self.current_state = initial_state
 
-    def add_transition(self, input_symbol, state, action=None, next_state=None):
-        """
-        Adds a transition to the instance variable state_transitions
-        that associates:
-            (input_symbol, current_state) --> (action, next_state)
+#     def add_transition(self, input_symbol, state, action=None, next_state=None):
+#         """
+#         Adds a transition to the instance variable state_transitions
+#         that associates:
+#             (input_symbol, current_state) --> (action, next_state)
 
-        The action may be set to None in which case the process() method will
-        ignore the action and only set the next_state.
+#         The action may be set to None in which case the process() method will
+#         ignore the action and only set the next_state.
 
-        The next_state may be set to None in which case the current state will be unchanged.
+#         The next_state may be set to None in which case the current state will be unchanged.
         
-        Args:
-            input_symbol (anything): The input received
-            state (anything): The current state
-            action (function, optional): The action to take/function to run. Defaults to None.
-            next_state (anything, optional): The next state to transition to. Defaults to None.
-        """
-        # TODO: implement add transition
-        if next_state != None:
-            self.state_transitions[(input_symbol, state)] = (action, next_state)
-        else:
-            self.state_transitions[(input_symbol, state)] = (action, state)
+#         Args:
+#             input_symbol (anything): The input received
+#             state (anything): The current state
+#             action (function, optional): The action to take/function to run. Defaults to None.
+#             next_state (anything, optional): The next state to transition to. Defaults to None.
+#         """
+#         # TODO: implement add transition
+#         if next_state != None:
+#             self.state_transitions[(input_symbol, state)] = (action, next_state)
+#         else:
+#             self.state_transitions[(input_symbol, state)] = (action, state)
 
 
-    def get_transition(self, input_symbol, state):
-        """
-        Returns tuple (action, next state) given an input_symbol and state.
-        Normally you do not call this method directly. It is called by
-        process().
+#     def get_transition(self, input_symbol, state):
+#         """
+#         Returns tuple (action, next state) given an input_symbol and state.
+#         Normally you do not call this method directly. It is called by
+#         process().
 
-        Args:
-            input_symbol (anything): The given input symbol
-            state (anything): The current state
+#         Args:
+#             input_symbol (anything): The given input symbol
+#             state (anything): The current state
 
-        Returns:
-            tuple: Returns the tuple (action, next_state)
-        """
-        # TODO: Implement get transition
-        return(self.state_transitions[(input_symbol, state)])
-        
-
-    def process(self, input_symbol):
-        """
-        The main method that you call to process input. This may
-        cause the FSM to change state and call an action. This method calls
-        get_transition() to find the action and next_state associated with the
-        input_symbol and current_state. If the action is None then the action
-        is not called and only the current state is changed. This method
-        processes one complete input symbol.
-        Args:
-            input_symbol (anything): The input to process
-        """
-        # TODO: Implement process
-        update = self.get_transition(input_symbol, self.current_state)
-        if update[0] != None:
-            update[0]()
-        self.current_state = update[1]
+#         Returns:
+#             tuple: Returns the tuple (action, next_state)
+#         """
+#         # TODO: Implement get transition
+#         return(self.state_transitions[(input_symbol, state)])
         
 
-class NPC:
-    # States
-    UP, DOWN, LEFT, RIGHT = "u", "d", "r", "l"
+#     def process(self, input_symbol):
+#         """
+#         The main method that you call to process input. This may
+#         cause the FSM to change state and call an action. This method calls
+#         get_transition() to find the action and next_state associated with the
+#         input_symbol and current_state. If the action is None then the action
+#         is not called and only the current state is changed. This method
+#         processes one complete input symbol.
+#         Args:
+#             input_symbol (anything): The input to process
+#         """
+#         # TODO: Implement process
+#         update = self.get_transition(input_symbol, self.current_state)
+#         if update[0] != None:
+#             update[0]()
+#         self.current_state = update[1]
+        
 
-    # Inputs
-    TIMER_UP = "tu"
-    DIRECTIONS = {UP: npc_image_up, DOWN: npc_image_down, RIGHT: npc_image_right, LEFT: npc_image_left}
+# class NPC:
+#     # States
+#     UP, DOWN, LEFT, RIGHT = "u", "d", "r", "l"
+
+#     # Inputs
+#     TIMER_UP = "tu"
+#     DIRECTIONS = {UP: npc_image_up, DOWN: npc_image_down, RIGHT: npc_image_right, LEFT: npc_image_left}
 
 
-    def __init__(self):
-        # Initialize FSM
-        self.fsm = FSM(self.DOWN)
-        self.init_fsm()
-        self.timer_duration = 1
+#     def __init__(self):
+#         # Initialize FSM
+#         self.fsm = FSM(self.DOWN)
+#         self.init_fsm()
+#         self.timer_duration = 1
 
-        # Start DOWN
-        self.turn_DOWN()
-        pygame.display.flip()
+#         # Start DOWN
+#         self.turn_DOWN()
+#         pygame.display.flip()
 
-    def init_fsm(self):
-        """
-        Adds all states to the FSM
-        """
-        self.fsm.add_transition(self.TIMER_UP, self.DOWN, self.turn_RIGHT, self.RIGHT)
-        self.fsm.add_transition(self.TIMER_UP, self.RIGHT, self.turn_UP, self.UP)
-        self.fsm.add_transition(self.TIMER_UP, self.UP, self.turn_LEFT, self.LEFT)
-        self.fsm.add_transition(self.TIMER_UP, self.LEFT, self.turn_DOWN, self.DOWN)
+    # def init_fsm(self):
+    #     """
+    #     Adds all states to the FSM
+    #     """
+    #     self.fsm.add_transition(self.TIMER_UP, self.DOWN, self.turn_RIGHT, self.RIGHT)
+    #     self.fsm.add_transition(self.TIMER_UP, self.RIGHT, self.turn_UP, self.UP)
+    #     self.fsm.add_transition(self.TIMER_UP, self.UP, self.turn_LEFT, self.LEFT)
+    #     self.fsm.add_transition(self.TIMER_UP, self.LEFT, self.turn_DOWN, self.DOWN)
 
-    def turn_RIGHT(self):
-        screen.blit(self.DIRECTIONS[self.RIGHT], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-        self.timer_duration = 5
+    # def turn_RIGHT(self):
+    #     screen.blit(self.DIRECTIONS[self.RIGHT], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    #     self.timer_duration = 5
     
-    def turn_UP(self):
-        screen.blit(self.DIRECTIONS[self.UP], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-        self.timer_duration = 5
+    # def turn_UP(self):
+    #     screen.blit(self.DIRECTIONS[self.UP], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    #     self.timer_duration = 5
     
-    def turn_DOWN(self):
-        screen.blit(self.DIRECTIONS[self.DOWN], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-        self.timer_duration = 5
+    # def turn_DOWN(self):
+    #     screen.blit(self.DIRECTIONS[self.DOWN], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    #     self.timer_duration = 5
     
-    def turn_LEFT(self):
-        screen.blit(self.DIRECTIONS[self.LEFT], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-        self.timer_duration = 5
+    # def turn_LEFT(self):
+    #     screen.blit(self.DIRECTIONS[self.LEFT], (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    #     self.timer_duration = 5
 
-    def run(self):
+def run(self):
         start_time = time.time()
 
         while True:
@@ -341,19 +341,17 @@ while running:
     # Draw player character
     screen.blit(player_image, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
-    # # Draw NPC character
-    # if npc_direction == "up":
-    #     screen.blit(npc_image_up, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-    # # Add similar conditions for other directions
-    # if npc_direction == "right":
-    #     screen.blit(npc_image_right, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-    # if npc_direction == "down":
-    #     screen.blit(npc_image_down, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
-    # if npc_direction == "left":
-    #     screen.blit(npc_image_left, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    # Draw NPC character
+    if npc_direction == "up":
+        screen.blit(npc_image_up, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    # Add similar conditions for other directions
+    if npc_direction == "right":
+        screen.blit(npc_image_right, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    if npc_direction == "down":
+        screen.blit(npc_image_down, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
+    if npc_direction == "left":
+        screen.blit(npc_image_left, (npc_x * TILE_SIZE, npc_y * TILE_SIZE))
 
-    npc = NPC()
-    npc.run()
 
 
     # Display player's GPA in the bottom right corner

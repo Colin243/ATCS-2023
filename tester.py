@@ -1,6 +1,5 @@
 import pygame
 import sys
-import time
 import random
 
 # Constants
@@ -92,13 +91,13 @@ class PokemonGame:
         self.npc = NPC(8, 6)
         self.question_initiated = False
         # Font for displaying text
-        self.font = pygame.font.Font(None, 36)
+        self.font = pygame.font.Font(None, 25)
 
         # Question and answer data
         self.question_data = {
-            "question": "What is the capital of France?",
-            "answers": ["London", "Paris", "Berlin", "Madrid"],
-            "correct_answer": "Paris"
+            "question": "If D has spatial coordinates of 12 years and b has time coordinates of 40 years and Event A has time coordinates of 16 years, what is the age of Eddie when they meet up? Assume they are both 18 years old at the origin (event 0)",
+            "answers": ["51.23", "49.36", "47.85", "58"],
+            "correct_answer": "49.36"
         }
 
 
@@ -124,12 +123,11 @@ class PokemonGame:
 
 
     def display_gpa(self):
-        gpa_text = self.font.render(f"GPA: {self.player.gpa:.2f}", True, (0, 0, 0))
+        gpa_text = self.font.render(f"GPA: {self.player.gpa:.2f}", True, (237, 97, 255))
         self.screen.blit(gpa_text, (WIDTH - 150, HEIGHT - 30))
 
     def question_sequence(self):
         # Function to handle the question sequence
-        # ... (previous code)
 
         # Create a new Pygame window for the question
         question_screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -141,19 +139,25 @@ class PokemonGame:
         # Display feedback text
         feedback_text = self.font.render("", True, (0, 0, 0))  # Initialize feedback text
 
-
         # Display question and answers
         question_text = self.font.render(self.question_data["question"], True, (0, 0, 0))
-        question_screen.blit(question_text, (WIDTH // 2 - 150, HEIGHT // 2 - 100))
 
+        # Calculate the number of lines needed for the question
+        question_lines = self.calculate_wrapped_text(self.question_data["question"], self.font, WIDTH - 40)
+
+        # Render each line of the question
+        for i, line in enumerate(question_lines):
+            line_text = self.font.render(line, True, (0, 0, 0))
+            question_screen.blit(line_text, (20, HEIGHT // 2 - 100 + i * 30))
+
+        # Display answer texts
         answer_texts = []
         for i, answer in enumerate(self.question_data["answers"]):
             answer_text = self.font.render(f"{i + 1}. {answer}", True, (0, 0, 0))
             answer_texts.append(answer_text)
-            question_screen.blit(answer_text, (WIDTH // 2 - 150, HEIGHT // 2 - 50 + i * 30))
+            question_screen.blit(answer_text, (WIDTH // 2 - 150, HEIGHT // 2 - 50 + len(question_lines) * 30 + i * 30))
 
         pygame.display.flip()
-        
 
         # Wait for player input
         selected_answer = None
@@ -164,34 +168,90 @@ class PokemonGame:
                         answers = self.question_data["answers"]
                         selected_answer = answers[int(event.key - pygame.K_1)]
                     elif event.key == pygame.K_ESCAPE:
+                        pygame.quit()
                         sys.exit()
 
-        # Check the selected answer
-        correct_answer = self.question_data["correct_answer"]
-        if selected_answer == correct_answer:
-            feedback_text = self.font.render("Correct!", True, (0, 255, 0))
-            # Handle correct answer
-            self.player.gpa += 0.05
-        else:
-            feedback_text = self.font.render("Incorrect!", True, (255, 0, 0))
-            # Handle incorrect answer
-            self.player.gpa -= 0.1
-        
-        # Display feedback text at the top
-        question_screen.blit(feedback_text, (WIDTH // 2 - 50, 20))
-        
-        
+            # Check the selected answer
+            if selected_answer is not None:
+                correct_answer = self.question_data["correct_answer"]
+                if selected_answer == correct_answer:
+                    feedback_text = self.font.render("Correct!", True, (0, 255, 0))
+                    # Handle correct answer
+                    self.player.gpa += 1.00
+                else:
+                    feedback_text = self.font.render("Incorrect!", True, (255, 0, 0))
+                    # Handle incorrect answer
+                    self.player.gpa -= 1.00
+
+                # Display feedback text at the top
+                question_screen.blit(feedback_text, (WIDTH // 2 - 50, 20))
+
+                # Display player's updated GPA in the bottom right corner
+                self.display_gpa()
+
+                pygame.display.flip()
+
+                # Wait for a moment to display feedback
+                pygame.time.delay(2000)
+
+                # Reset to the original Pokemon Forest screen
+                break
+
+
+
+    def calculate_wrapped_text(self, text, font, max_width):
+        words = text.split(' ')
+        lines = []
+        current_line = []
+
+        for word in words:
+            if font.size(' '.join(current_line + [word]))[0] <= max_width:
+                current_line.append(word)
+            else:
+                lines.append(' '.join(current_line))
+                current_line = [word]
+
+        lines.append(' '.join(current_line))
+        return lines
+    
+    def college_submission_sequence(self):
+        # Create a new Pygame window for the college submission
+        submission_screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("College Submission")
+
+        # Draw a blank white background
+        submission_screen.fill(WHITE)
+
+        # Display submission prompt
+        prompt_text = self.font.render("Are you ready to submit? (Press Enter to submit, Esc to return to the game)", True, (0, 0, 0))
+        submission_screen.blit(prompt_text, (WIDTH // 2 - 250, HEIGHT // 2 - 30))
+
         pygame.display.flip()
 
-        # Wait for a moment to display feedback
-        pygame.time.delay(2000)
+        # Wait for player input
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        # Check GPA for college acceptance
+                        if self.player.gpa >= 3.8:
+                            message_text = self.font.render("You got into college!", True, (0, 255, 0))
+                        else:
+                            message_text = self.font.render("Sorry, try again next year.", True, (255, 0, 0))
+                        
+                        # Display the acceptance message
+                        submission_screen.fill(WHITE)
+                        submission_screen.blit(message_text, (WIDTH // 2 - 150, HEIGHT // 2 - 30))
+                        pygame.display.flip()
 
-        # Reset to the original Pokemon Forest screen
-        question_initiated = False
+                        # Wait for a moment to display the message
+                        pygame.time.delay(2000)
 
-        # Font for displaying text
-        # font = pygame.font.Font(None, 36)
-
+                        # Return to the original Pokemon Forest screen
+                        return
+                    elif event.key == pygame.K_ESCAPE:
+                        # Return to the game
+                        return
 
     def run_game(self):
         clock = pygame.time.Clock()
@@ -245,7 +305,7 @@ class PokemonGame:
                     self.question_sequence()
 
             # Draw background
-            self.screen.fill(WHITE)
+            self.screen.fill(GREEN)
 
             # Draw forest map
             for y, row in enumerate(self.forest_map):
