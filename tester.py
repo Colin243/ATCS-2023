@@ -252,6 +252,29 @@ class PokemonGame:
                     elif event.key == pygame.K_ESCAPE:
                         # Return to the game
                         return
+    def college_submission_sequence(self):
+        # Create a new Pygame window for the college submission
+        submission_screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("College Submission")
+
+        # Draw a blank white background
+        submission_screen.fill(WHITE)
+
+        # Display submission outcome
+        outcome_text = None
+        if self.player.gpa == 4:
+            outcome_text = self.font.render("You got into college!", True, (0, 255, 0))
+        elif 2 < self.player.gpa < 4:
+            outcome_text = self.font.render("You were deferred.", True, (255, 165, 0))
+        elif self.player.gpa <= 2:
+            outcome_text = self.font.render("You were rejected.", True, (255, 0, 0))
+
+        submission_screen.blit(outcome_text, (WIDTH // 2 - 150, HEIGHT // 2 - 30))
+        pygame.display.flip()
+
+        # Wait for a moment to display the outcome
+        pygame.time.delay(2000)
+
 
     def run_game(self):
         clock = pygame.time.Clock()
@@ -266,6 +289,12 @@ class PokemonGame:
             # Player movement
             keys = pygame.key.get_pressed()
             next_x, next_y = self.player_x, self.player_y
+
+
+            # Check if the player reaches the spot [0][1]
+            if self.player_x == 1 and self.player_y == 0:
+                self.college_submission_sequence()
+
 
             if keys[pygame.K_LEFT]:
                 next_x -= 1
