@@ -157,45 +157,7 @@ class PokemonGame:
 
         lines.append(' '.join(current_line))
         return lines
-    
-    def college_submission_sequence(self):
-        # Create a new Pygame window for the college submission
-        submission_screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("College Submission")
 
-        # Draw a blank white background
-        submission_screen.fill(WHITE)
-
-        # Display submission prompt
-        prompt_text = self.font.render("Are you ready to submit? (Press Enter to submit, Esc to return to the game)", True, (0, 0, 0))
-        submission_screen.blit(prompt_text, (WIDTH // 2 - 250, HEIGHT // 2 - 30))
-
-        pygame.display.flip()
-
-        # Wait for player input
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        # Check GPA for college acceptance
-                        if self.player.gpa >= 3.8:
-                            message_text = self.font.render("You got into college!", True, (0, 255, 0))
-                        else:
-                            message_text = self.font.render("Sorry, try again next year.", True, (255, 0, 0))
-                        
-                        # Display the acceptance message
-                        submission_screen.fill(WHITE)
-                        submission_screen.blit(message_text, (WIDTH // 2 - 150, HEIGHT // 2 - 30))
-                        pygame.display.flip()
-
-                        # Wait for a moment to display the message
-                        pygame.time.delay(2000)
-
-                        # Return to the original Pokemon Forest screen
-                        return
-                    elif event.key == pygame.K_ESCAPE:
-                        # Return to the game
-                        return
     def college_submission_sequence(self):
         # Create a new Pygame window for the college submission
         submission_screen = pygame.display.set_mode((WIDTH, HEIGHT))
