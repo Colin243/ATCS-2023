@@ -1,3 +1,5 @@
+# Code Generated and Modified by ChatGPT
+
 import pygame
 import sys
 import random
