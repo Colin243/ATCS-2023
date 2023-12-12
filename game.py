@@ -41,7 +41,7 @@ class PokemonGame:
 
         # Question and answer data
         self.question_data = {
-            "question": "You are travelling at 0.9c going to a newly discoverd planet some 4 light years away. When you leave you are 17. You travel there, hangout for 2 years and then travel home. Hiw old are you when you get home?",
+            "question": "You are travelling at 0.9c going to a newly discoverd planet some 4 light years away. When you leave you are 17. You travel there, hangout for 2 years and then travel home. How old are you when you get home?",
             "answers": ["20.5", "22.8", "24.6", "27"],
             "correct_answer": "22.8"
         }
