@@ -39,9 +39,9 @@ class PokemonGame:
 
         # Question and answer data
         self.question_data = {
-            "question": "If D has spatial coordinates of 12 years and b has time coordinates of 40 years and Event A has time coordinates of 16 years, what is the age of Eddie when they meet up? Assume they are both 18 years old at the origin (event 0)",
-            "answers": ["51.23", "49.36", "47.85", "58"],
-            "correct_answer": "49.36"
+            "question": "You are travelling at 0.9c going to a newly discoverd planet some 4 light years away. When you leave you are 17. You travel there, hangout for 2 years and then travel home. Hiw old are you when you get home?",
+            "answers": ["20.5", "22.8", "24.6", "27"],
+            "correct_answer": "22.8"
         }
 
 
@@ -182,7 +182,6 @@ class PokemonGame:
         pygame.time.delay(5000)
 
         pygame.quit()
-
 
     def run_game(self):
         clock = pygame.time.Clock()
