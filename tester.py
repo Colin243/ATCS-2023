@@ -1,6 +1,9 @@
 import pygame
 import sys
 import random
+from player import *
+from fsm import *
+from npc import *
 
 # Constants
 WIDTH, HEIGHT = 500, 500
@@ -9,65 +12,6 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
-class Player:
-    def __init__(self, name):
-        self.name = name
-        self.gpa = 3.00
-
-        # Ensure GPA does not exceed 4.00
-        self.gpa = min(self.gpa, 4.50)
-
-class FSM:
-    def __init__(self, initial_state):
-        # Dictionary (input_symbol, current_state) --> (action, next_state).
-        self.state_transitions = {}
-        self.current_state = initial_state
-
-    def add_transition(self, input_symbol, state, action=None, next_state=None):
-        if next_state is not None:
-            self.state_transitions[(input_symbol, state)] = (action, next_state)
-        else:
-            self.state_transitions[(input_symbol, state)] = (action, state)
-
-    def get_transition(self, input_symbol, state):
-        return self.state_transitions[(input_symbol, state)]
-
-    def process(self, input_symbol):
-        update = self.get_transition(input_symbol, self.current_state)
-        if update[0] is not None:
-            update[0]()
-        self.current_state = update[1]
-
-class NPC:
-    UP, DOWN, LEFT, RIGHT = "u", "d", "l", "r"
-    TIMER_UP = "tu"
-    DIRECTIONS = {UP: "npc_up.png", DOWN: "npc_down.png", LEFT: "npc_left.png", RIGHT: "npc_right.png"}
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.directions = list(self.DIRECTIONS.keys())
-        self.direction = random.choice(self.directions)
-        self.fsm = FSM(self.DOWN)
-        self.init_fsm()
-
-    def init_fsm(self):
-        self.fsm.add_transition(self.TIMER_UP, self.DOWN, self.turn_LEFT, self.LEFT)
-        self.fsm.add_transition(self.TIMER_UP, self.LEFT, self.turn_UP, self.UP)
-        self.fsm.add_transition(self.TIMER_UP, self.UP, self.turn_RIGHT, self.RIGHT)
-        self.fsm.add_transition(self.TIMER_UP, self.RIGHT, self.turn_DOWN, self.DOWN)
-
-    def turn_UP(self):
-        self.direction = self.UP
-
-    def turn_DOWN(self):
-        self.direction = self.DOWN
-
-    def turn_LEFT(self):
-        self.direction = self.LEFT
-
-    def turn_RIGHT(self):
-        self.direction = self.RIGHT
 
 class PokemonGame:
     def __init__(self):
@@ -273,7 +217,9 @@ class PokemonGame:
         pygame.display.flip()
 
         # Wait for a moment to display the outcome
-        pygame.time.delay(2000)
+        pygame.time.delay(5000)
+
+        pygame.quit()
 
 
     def run_game(self):
